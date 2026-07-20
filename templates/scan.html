@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>NutriScan AI - Food Scanner</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Segoe UI,sans-serif;
+}
+
+body{
+
+min-height:100vh;
+
+background:
+radial-gradient(circle at top,#00ff8840,transparent 35%),
+#03140d;
+
+color:white;
+padding:15px;
+
+}
+
+
+.scan-box{
+
+max-width:400px;
+margin:auto;
+text-align:center;
+
+}
+
+
+h1{
+
+color:#35ff87;
+font-size:28px;
+margin:10px;
+
+}
+
+
+.subtitle{
+
+color:#ccc;
+font-size:14px;
+
+}
+
+
+button{
+
+width:100%;
+padding:15px;
+margin-top:12px;
+border:none;
+border-radius:18px;
+
+background:#35ff87;
+color:black;
+
+font-size:16px;
+font-weight:bold;
+
+}
+
+
+
+.camera-box{
+
+height:260px;
+
+margin-top:15px;
+
+border-radius:22px;
+
+background:#ffffff12;
+
+border:2px dashed #35ff87;
+
+overflow:hidden;
+
+position:relative;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+}
+
+
+
+video,
+#preview{
+
+width:100%;
+height:100%;
+
+object-fit:cover;
+
+display:none;
+
+}
+
+
+
+.camera-icon{
+
+font-size:55px;
+
+}
+
+
+
+.capture{
+
+position:absolute;
+
+bottom:15px;
+
+width:65px;
+
+height:65px;
+
+border-radius:50%;
+
+background:#35ff87;
+
+border:5px solid white;
+
+display:none;
+
+}
+
+
+
+.scan{
+
+margin-top:15px;
+
+color:#35ff87;
+
+display:none;
+
+font-weight:bold;
+
+}
+
+
+
+.card{
+
+margin-top:15px;
+
+background:#ffffff12;
+
+padding:18px;
+
+border-radius:22px;
+
+display:none;
+
+}
+
+
+
+.card h2{
+
+color:#35ff87;
+
+}
+
+
+
+.score{
+
+font-size:45px;
+
+color:#35ff87;
+
+font-weight:bold;
+
+}
+
+
+
+.row{
+
+display:flex;
+
+justify-content:space-between;
+
+padding:12px 0;
+
+border-bottom:1px solid #ffffff20;
+
+}
+
+
+
+.back{
+
+background:#ffffff12;
+
+color:#35ff87;
+
+border:1px solid #35ff87;
+
+}
+
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="scan-box">
+
+
+<h1>📷 Food Scanner</h1>
+
+
+<p class="subtitle">
+Upload food image and get AI health analysis
+</p>
+
+
+<input 
+type="file"
+id="file"
+accept="image/*"
+hidden
+onchange="uploadPreview(event)"
+>
+
+
+
+<button onclick="document.getElementById('file').click()">
+
+📁 Upload Food Image
+
+</button>
+
+
+
+<button onclick="openCamera()">
+
+📷 Open Camera
+
+</button>
+
+
+
+<div class="camera-box">
+
+
+<video id="video" autoplay playsinline></video>
+
+
+<img id="preview">
+
+
+<span id="icon" class="camera-icon">
+
+📸
+
+</span>
+
+
+
+<button id="capture" class="capture" onclick="capturePhoto()">
+
+</button>
+
+
+</div>
+
+
+<div id="scan" class="scan">
+
+🔍 Scanning Food...
+
+</div>
+
+
+<div id="resultCard" class="card">
+
+
+<h2>
+🤖 AI Result
+</h2>
+
+
+
+
+
+<div class="row">
+🥗 Food
+<span>Salad</span>
+</div>
+
+
+<div class="row">
+🔥 Calories
+<span>220 kcal</span>
+</div>
+
+
+<div class="row">
+🍬 Sugar
+<span>Low</span>
+</div>
+
+
+<div class="row">
+💪 Protein
+<span>High</span>
+</div>
+
+
+</div>
+
+
+<button class="back" onclick="location.href='dashboard.html'">
+
+← Back To Dashboard
+
+</button>
+
+
+</div>
+<script>
+
+let stream = null;
+
+
+// OPEN CAMERA
+
+function openCamera(){
+
+navigator.mediaDevices.getUserMedia({
+
+video:{
+facingMode:"environment"
+}
+
+})
+
+.then(function(s){
+
+stream=s;
+
+let video=document.getElementById("video");
+
+let icon=document.getElementById("icon");
+
+let capture=document.getElementById("capture");
+
+
+video.srcObject=s;
+
+video.style.display="block";
+
+icon.style.display="none";
+
+capture.style.display="block";
+
+
+video.play();
+
+
+})
+
+
+.catch(function(){
+
+alert("Camera permission allow karo");
+
+});
+
+
+}
+
+
+
+
+// CAPTURE PHOTO
+
+
+function capturePhoto(){
+
+let video=document.getElementById("video");
+let preview=document.getElementById("preview");
+let result=document.getElementById("resultCard");
+let canvas=document.createElement("canvas");
+
+canvas.width=video.videoWidth;
+canvas.height=video.videoHeight;
+
+let ctx=canvas.getContext("2d");
+
+ctx.drawImage(video,0,0);
+
+
+preview.src=canvas.toDataURL("image/png");
+
+preview.style.display="block";
+
+video.style.display="none";
+
+
+stopCamera();
+
+
+// AI Scan effect
+
+setTimeout(function(){
+
+result.style.display="block";
+
+},1500);
+
+
+}
+
+
+// UPLOAD IMAGE
+
+
+function uploadPreview(event){
+
+
+let preview=document.getElementById("preview");
+
+
+preview.src=URL.createObjectURL(
+event.target.files[0]
+);
+
+
+
+preview.style.display="block";
+
+
+startScan();
+
+
+}
+
+
+
+
+// SCAN EFFECT
+
+
+function startScan(){
+
+
+let scan=document.getElementById("scan");
+
+let result=document.getElementById("result");
+
+
+scan.style.display="block";
+
+result.style.display="none";
+
+
+
+setTimeout(function(){
+
+
+scan.style.display="none";
+
+
+result.style.display="block";
+
+
+},2500);
+
+
+
+}
+
+
+
+// STOP CAMERA
+
+
+function stopCamera(){
+
+
+if(stream){
+
+
+let tracks=stream.getTracks();
+
+
+tracks.forEach(function(track){
+
+track.stop();
+
+});
+
+
+stream=null;
+
+
+}
+
+
+}
+
+
+</script>
+
+</body>
+</html>
