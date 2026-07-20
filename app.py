@@ -1,42 +1,26 @@
-from flask import Flask, request, jsonify
-import os
+from flask import Flask, render_template
 
 app = Flask(__name__)
 
-UPLOAD_FOLDER = "uploads"
-
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-
-
 @app.route("/")
 def home():
-    return "NutriScan AI Server Running"
+    return render_template("login.html")
 
+@app.route("/dashboard")
+def dashboard():
+    return render_template("dashboard.html")
 
-@app.route("/scan", methods=["POST"])
-def scan_food():
+@app.route("/scan")
+def scan():
+    return render_template("scan.html")
 
-    if "image" not in request.files:
-        return jsonify({
-            "error": "Image nahi mili"
-        })
+@app.route("/profile")
+def profile():
+    return render_template("profile.html")
 
-    image = request.files["image"]
-
-    path = os.path.join(UPLOAD_FOLDER, image.filename)
-    image.save(path)
-
-
-    # Abhi demo result
-    result = {
-        "food": "Unknown",
-        "score": "Checking...",
-        "message": "AI analysis starting"
-    }
-
-    return jsonify(result)
-
+@app.route("/reports")
+def reports():
+    return render_template("reports.html")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
